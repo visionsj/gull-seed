@@ -1,23 +1,17 @@
 {
   "name": "gull-seed",
-  "version": "1.0.0-rc11",
-  "description": "A minimalistic framework for server-rendered Vue.js applications (inspired by Next.js)",
-  "contributors": [
-    {
-      "name": "Sebastien Chopin (@Atinux)"
-    },
-    {
-      "name": "Alexandre Chopin (@alexchopin)"
-    },
-    {
-      "name": "Pooya Parsa (@pi0)"
-    }
-  ],
+  "version": "1.0.1-rc13",
+  "description": "gull-seed 是基于NUXT开发的一套Server Side Rendering（服务端渲染）, 主要解决单页面应用的 SEO 的问题",
   "main": "./index.js",
   "license": "MIT",
+  "contributors": [
+    {
+      "name": "Yanhui He(@gull)"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nuxt/nuxt.js"
+    "url": "git+https://github.com/visionsj/gull-seed"
   },
   "files": [
     "bin",
@@ -25,19 +19,8 @@
     "lib",
     "index.js"
   ],
-  "keywords": [
-    "nuxt",
-    "nuxt.js",
-    "nuxtjs",
-    "vue",
-    "vue.js",
-    "vuejs",
-    "vue universal",
-    "vue ssr",
-    "vue isomorphic",
-    "vue versatile"
-  ],
-  "homepage": "https://github.com/nuxt/nuxt.js#readme",
+  "keywords": ["gull-seed"],
+  "homepage": "https://github.com/visionsj/gull-seed#readme",
   "bin": {
     "nuxt": "./bin/nuxt"
   },
@@ -156,10 +139,5 @@
     "rollup-watch": "^4.3.1",
     "std-mocks": "^1.0.1",
     "uglify-js": "^3.0.28"
-  },
-  "collective": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/nuxtjs",
-    "logo": "https://opencollective.com/nuxtjs/logo.txt?reverse=true&variant=variant2"
   }
 }

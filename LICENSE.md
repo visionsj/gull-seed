@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2016-2017 Sebastien Chopin ([@Atinux](https://github.com/Atinux)) & Alexandre Chopin ([@alexchopin](https://github.com/alexchopin))
+Copyright (c) 2017-present, JM-TEAM-HEYANHUI
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

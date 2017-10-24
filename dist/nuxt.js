@@ -1,5 +1,5 @@
 /*!
- * Nuxt.js v1.0.0-rc11
+ * Gull-Seed.js v1.0.0
  * Released under the MIT License.
  */
 'use strict';
@@ -1591,7 +1591,7 @@ Options.defaults = {
   mode: 'universal',
   dev: process.env.NODE_ENV !== 'production',
   debug: undefined, // Will be equal to dev if not provided
-  buildDir: '.nuxt',
+  buildDir: '.gull',
   cacheDir: '.cache',
   nuxtAppDir: path.resolve(__dirname, '../lib/app/'), // Relative to dist
   build: {
@@ -1600,7 +1600,7 @@ Options.defaults = {
     extractCSS: false,
     cssSourceMap: undefined,
     ssr: undefined,
-    publicPath: '/_nuxt/',
+    publicPath: '/_gull/',
     filenames: {
       css: 'common.[contenthash].css',
       manifest: 'manifest.[hash].js',
