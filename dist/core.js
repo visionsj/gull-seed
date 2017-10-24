@@ -1,17 +1,15 @@
 /*!
- * Nuxt.js v1.0.0-rc11
+ * Nuxt.js v1.0.0-rc3
  * Released under the MIT License.
  */
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
-var path = require('path');
-var path__default = _interopDefault(path);
 var _ = require('lodash');
 var ___default = _interopDefault(_);
+var path = require('path');
+var path__default = _interopDefault(path);
 var fs = require('fs');
 var fs__default = _interopDefault(fs);
 var hash = _interopDefault(require('hash-sum'));
@@ -26,16 +24,16 @@ var pify = _interopDefault(require('pify'));
 var serveStatic = _interopDefault(require('serve-static'));
 var compression = _interopDefault(require('compression'));
 var fs$1 = _interopDefault(require('fs-extra'));
-var VueServerRenderer = require('vue-server-renderer');
-var VueServerRenderer__default = _interopDefault(VueServerRenderer);
-var Youch = _interopDefault(require('@nuxtjs/youch'));
-var sourceMap = require('source-map');
+var vueServerRenderer = require('vue-server-renderer');
 var connect = _interopDefault(require('connect'));
-var Vue = _interopDefault(require('vue'));
-var VueMeta = _interopDefault(require('vue-meta'));
-var LRU = _interopDefault(require('lru-cache'));
 var enableDestroy = _interopDefault(require('server-destroy'));
 var Module = _interopDefault(require('module'));
+
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+
+
+
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -232,6 +230,10 @@ var runtime = createCommonjsModule(function (module) {
           resolve$$1(result);
         }, reject);
       }
+    }
+
+    if (typeof global.process === "object" && global.process.domain) {
+      invoke = global.process.domain.bind(invoke);
     }
 
     var previousPromise;
@@ -767,16 +769,21 @@ var runtime = createCommonjsModule(function (module) {
     }
   };
 })(
-  // In sloppy mode, unbound `this` refers to the global object, fallback to
-  // Function constructor if we're in global strict mode. That is sadly a form
-  // of indirect eval which violates Content Security Policy.
-  (function() { return this })() || Function("return this")()
+  // Among the various tricks for obtaining a reference to the global
+  // object, this seems to be the most reliable technique that does not
+  // use indirect eval (which violates Content Security Policy).
+  typeof commonjsGlobal === "object" ? commonjsGlobal :
+  typeof window === "object" ? window :
+  typeof self === "object" ? self : commonjsGlobal
 );
 });
 
 // This method of obtaining a reference to the global object needs to be
 // kept identical to the way it is obtained in runtime.js
-var g = (function() { return this })() || Function("return this")();
+var g =
+  typeof commonjsGlobal === "object" ? commonjsGlobal :
+  typeof window === "object" ? window :
+  typeof self === "object" ? self : commonjsGlobal;
 
 // Use `getOwnPropertyNames` because not all browsers support calling
 // `hasOwnProperty` on the global `self` object in a worker. See #183.
@@ -803,9 +810,8 @@ if (hadRuntime) {
   }
 }
 
-var regenerator = runtimeModule;
+var index$1 = runtimeModule;
 
-var babelHelpers = {};
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
@@ -816,118 +822,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
 
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve$$1, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve$$1,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
 
 
 
@@ -1090,8 +985,6 @@ var toConsumableArray = function (arr) {
   }
 };
 
-babelHelpers;
-
 function encodeHtml(str) {
   return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -1114,8 +1007,8 @@ function setAnsiColors(ansiHTML$$1) {
 }
 
 var waitFor = function () {
-  var _ref = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(ms) {
-    return regenerator.wrap(function _callee$(_context) {
+  var _ref = asyncToGenerator(index$1.mark(function _callee(ms) {
+    return index$1.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
@@ -1187,45 +1080,17 @@ function chainFn(base, fn) {
     return;
   }
   return function () {
-    if (typeof base !== 'function') {
-      return fn.apply(this, arguments);
+    if (base instanceof Function) {
+      base.apply(this, arguments);
     }
-    var baseResult = base.apply(this, arguments);
-    // Allow function to mutate the first argument instead of returning the result
-    if (baseResult === undefined) {
-      baseResult = arguments[0];
-    }
-    var fnResult = fn.call.apply(fn, [this, baseResult].concat(toConsumableArray(Array.prototype.slice.call(arguments, 1))));
-    // Return mutated argument if no result was returned
-    if (fnResult === undefined) {
-      return baseResult;
-    }
-    return fnResult;
+    fn.apply(this, arguments);
   };
 }
 
-function isPureObject(o) {
-  return !Array.isArray(o) && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === 'object';
-}
-
-var isWindows = /^win/.test(process.platform);
-
-function wp() {
-  var p = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
+function wp(p) {
   /* istanbul ignore if */
-  if (isWindows) {
-    return p.replace(/\\/g, '\\\\');
-  }
-  return p;
-}
-
-function wChunk() {
-  var p = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
-  /* istanbul ignore if */
-  if (isWindows) {
-    return p.replace(/\//g, '\\\\');
+  if (/^win/.test(process.platform)) {
+    p = p.replace(/\\/g, '\\\\');
   }
   return p;
 }
@@ -1343,10 +1208,11 @@ function createRoutes(files, srcDir) {
     keys.forEach(function (key, i) {
       route.name = route.name ? route.name + '-' + key.replace('_', '') : key.replace('_', '');
       route.name += key === '_' ? 'all' : '';
-      route.chunkName = file.replace(/\.vue$/, '');
       var child = ___default.find(parent, { name: route.name });
       if (child) {
-        child.children = child.children || [];
+        if (!child.children) {
+          child.children = [];
+        }
         parent = child.children;
         route.path = '';
       } else {
@@ -1369,26 +1235,21 @@ function createRoutes(files, srcDir) {
       if (!b.path.length || b.path === '/') {
         return 1;
       }
-      var i = 0;
       var res = 0;
-      var y = 0;
-      var z = 0;
       var _a = a.path.split('/');
       var _b = b.path.split('/');
-      for (i = 0; i < _a.length; i++) {
+      for (var i = 0; i < _a.length; i++) {
         if (res !== 0) {
           break;
         }
-        y = _a[i] === '*' ? 2 : _a[i].indexOf(':') > -1 ? 1 : 0;
-        z = _b[i] === '*' ? 2 : _b[i].indexOf(':') > -1 ? 1 : 0;
+        var y = _a[i].indexOf('*') > -1 ? 2 : _a[i].indexOf(':') > -1 ? 1 : 0;
+        var z = _b[i].indexOf('*') > -1 ? 2 : _b[i].indexOf(':') > -1 ? 1 : 0;
         res = y - z;
-        // If a.length >= b.length
         if (i === _b.length - 1 && res === 0) {
-          // change order if * found
-          res = _a[i] === '*' ? -1 : 1;
+          res = 1;
         }
       }
-      return res === 0 ? _a[i - 1] === '*' && _b[i] ? 1 : -1 : res;
+      return res === 0 ? -1 : res;
     });
   });
   return cleanChildrenRoutes(routes);
@@ -1407,10 +1268,7 @@ var Utils = Object.freeze({
 	sequence: sequence,
 	parallel: parallel,
 	chainFn: chainFn,
-	isPureObject: isPureObject,
-	isWindows: isWindows,
 	wp: wp,
-	wChunk: wChunk,
 	r: r,
 	relativeTo: relativeTo,
 	flatRoutes: flatRoutes,
@@ -1418,9 +1276,7 @@ var Utils = Object.freeze({
 	createRoutes: createRoutes
 });
 
-var Options = {};
-
-Options.from = function (_options) {
+function Options(_options) {
   // Clone options to prevent unwanted side-effects
   var options = Object.assign({}, _options);
 
@@ -1439,17 +1295,12 @@ Options.from = function (_options) {
   }
 
   // Apply defaults
-  ___default.defaultsDeep(options, Options.defaults);
+  ___default.defaultsDeep(options, defaultOptions);
 
   // Resolve dirs
-  var hasValue = function hasValue(v) {
-    return typeof v === 'string' && v;
-  };
-  options.rootDir = hasValue(options.rootDir) ? options.rootDir : process.cwd();
-  options.srcDir = hasValue(options.srcDir) ? path.resolve(options.rootDir, options.srcDir) : options.rootDir;
-  options.modulesDir = path.resolve(options.rootDir, hasValue(options.modulesDir) ? options.modulesDir : 'node_modules');
-  options.buildDir = path.resolve(options.rootDir, options.buildDir);
-  options.cacheDir = path.resolve(options.rootDir, options.cacheDir);
+  options.rootDir = typeof options.rootDir === 'string' && options.rootDir ? options.rootDir : process.cwd();
+  options.srcDir = typeof options.srcDir === 'string' && options.srcDir ? path.resolve(options.rootDir, options.srcDir) : options.rootDir;
+  options.buildDir = path.join(options.rootDir, options.buildDir);
 
   // If app.html is defined, set the template path to the user template
   options.appTemplatePath = path.resolve(options.buildDir, 'views/app.template.html');
@@ -1460,7 +1311,7 @@ Options.from = function (_options) {
   // Ignore publicPath on dev
   /* istanbul ignore if */
   if (options.dev && isUrl(options.build.publicPath)) {
-    options.build.publicPath = Options.defaults.build.publicPath;
+    options.build.publicPath = defaultOptions.build.publicPath;
   }
 
   // If store defined, update store options to true unless explicitly disabled
@@ -1468,93 +1319,22 @@ Options.from = function (_options) {
     options.store = true;
   }
 
-  // Normalize loadingIndicator
-  if (!isPureObject(options.loadingIndicator)) {
-    options.loadingIndicator = { name: options.loadingIndicator };
+  // Resolve mode
+  var mode = options.mode;
+  if (typeof mode === 'function') {
+    mode = mode();
+  }
+  if (typeof mode === 'string') {
+    mode = Modes[mode];
   }
 
-  // Apply defaults to loadingIndicator
-  options.loadingIndicator = Object.assign({
-    name: 'pulse',
-    color: '#dbe1ec',
-    background: 'white'
-  }, options.loadingIndicator);
-
-  // cssSourceMap
-  if (options.build.cssSourceMap === undefined) {
-    options.build.cssSourceMap = options.dev;
-  }
-
-  // Postcss
-  // 1. Check if it is explicitly disabled by false value
-  // ... Disable all postcss loaders
-  // 2. Check if any standard source of postcss config exists
-  // ... Make postcss = true letting loaders find this kind of config
-  // 3. Else (Easy Usage)
-  // ... Auto merge it with defaults
-  if (options.build.postcss !== false) {
-    // Detect postcss config existence
-    // https://github.com/michael-ciniawsky/postcss-load-config
-    var postcssConfigExists = false;
-    var _arr = [options.srcDir, options.rootDir];
-    for (var _i = 0; _i < _arr.length; _i++) {
-      var dir = _arr[_i];var _arr2 = ['postcss.config.js', '.postcssrc.js', '.postcssrc', '.postcssrc.json', '.postcssrc.yaml'];
-
-      for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        var file = _arr2[_i2];
-        if (fs.existsSync(path.resolve(dir, file))) {
-          postcssConfigExists = true;
-          break;
-        }
-      }
-      if (postcssConfigExists) break;
-    }
-
-    // Default postcss options
-    if (postcssConfigExists) {
-      options.build.postcss = true;
-    }
-
-    // Normalize & Apply default plugins
-    if (Array.isArray(options.build.postcss)) {
-      options.build.postcss = { plugins: options.build.postcss };
-    }
-    if (isPureObject(options.build.postcss)) {
-      options.build.postcss = Object.assign({
-        sourceMap: options.build.cssSourceMap,
-        plugins: {
-          // https://github.com/postcss/postcss-import
-          'postcss-import': {
-            root: options.rootDir,
-            path: [options.srcDir, options.rootDir, options.modulesDir]
-          },
-          // https://github.com/postcss/postcss-url
-          'postcss-url': {},
-          // http://cssnext.io/postcss
-          'postcss-cssnext': {}
-        }
-      }, options.build.postcss);
-    }
-  }
-
-  // Debug errors
-  if (options.debug === undefined) {
-    options.debug = options.dev;
-  }
-
-  // Apply mode preset
-  var modePreset = Options.modes[options.mode || 'universal'] || Options.modes['universal'];
-  ___default.defaultsDeep(options, modePreset);
-
-  // If no server-side rendering, add appear true transition
-  if (options.render.ssr === false) {
-    options.transition.appear = true;
-  }
+  // Apply mode
+  ___default.defaultsDeep(options, mode);
 
   return options;
-};
+}
 
-Options.modes = {
+var Modes = {
   universal: {
     build: {
       ssr: true
@@ -1570,34 +1350,37 @@ Options.modes = {
     render: {
       ssr: false
     }
+  },
+  static: {
+    build: {
+      ssr: true
+    },
+    render: {
+      ssr: 'static'
+    }
   }
 };
 
-Options.defaults = {
+var defaultOptions = {
   mode: 'universal',
   dev: process.env.NODE_ENV !== 'production',
-  debug: undefined, // Will be equal to dev if not provided
   buildDir: '.nuxt',
-  cacheDir: '.cache',
   nuxtAppDir: path.resolve(__dirname, '../lib/app/'), // Relative to dist
   build: {
     analyze: false,
-    dll: false,
     extractCSS: false,
-    cssSourceMap: undefined,
     ssr: undefined,
     publicPath: '/_nuxt/',
     filenames: {
-      css: 'common.[contenthash].css',
+      css: 'common.[chunkhash].css',
       manifest: 'manifest.[hash].js',
-      vendor: 'common.[chunkhash].js',
-      app: 'app.[chunkhash].js',
-      chunk: '[name].[chunkhash].js'
+      vendor: 'vendor.bundle.[chunkhash].js',
+      app: 'nuxt.bundle.[chunkhash].js'
     },
     vendor: [],
     plugins: [],
     babel: {},
-    postcss: {},
+    postcss: undefined,
     templates: [],
     watch: [],
     devMiddleware: {},
@@ -1624,7 +1407,7 @@ Options.defaults = {
       removeStyleLinkTypeAttributes: false,
       removeTagWhitespace: false,
       sortAttributes: true,
-      sortClassName: false,
+      sortClassName: true,
       trimCustomFragments: true,
       useShortDoctype: true
     }
@@ -1646,17 +1429,11 @@ Options.defaults = {
     color: 'black',
     failedColor: 'red',
     height: '2px',
-    duration: 5000,
-    rtl: false
+    duration: 5000
   },
-  loadingIndicator: {},
   transition: {
     name: 'page',
-    mode: 'out-in',
-    appear: false,
-    appearClass: 'appear',
-    appearActiveClass: 'appear-active',
-    appearToClass: 'appear-to'
+    mode: 'out-in'
   },
   router: {
     mode: 'history',
@@ -1685,19 +1462,8 @@ Options.defaults = {
     }
   },
   watchers: {
-    webpack: {
-      ignored: /-dll/
-    },
+    webpack: {},
     chokidar: {}
-  },
-  messages: {
-    error_404: 'This page could not be found',
-    server_error: 'Server error',
-    nuxtjs: 'Nuxt.js',
-    back_to_home: 'Back to the home page',
-    server_error_details: 'An error occurred in the application and your page could not be served. If you are the application owner, check your logs for details.',
-    client_error: 'Error',
-    client_error_details: 'An error occurred while rendering the page. Check developer tools console for details.'
   }
 };
 
@@ -1720,8 +1486,8 @@ var ModuleContainer = function (_Tapable) {
   createClass(ModuleContainer, [{
     key: '_ready',
     value: function () {
-      var _ref = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
-        return regenerator.wrap(function _callee$(_context) {
+      var _ref = asyncToGenerator(index$1.mark(function _callee() {
+        return index$1.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -1730,7 +1496,7 @@ var ModuleContainer = function (_Tapable) {
 
               case 2:
                 _context.next = 4;
-                return this.applyPluginsAsync('ready', this);
+                return this.nuxt.applyPluginsAsync('module', this);
 
               case 4:
               case 'end':
@@ -1819,11 +1585,11 @@ var ModuleContainer = function (_Tapable) {
   }, {
     key: 'addModule',
     value: function () {
-      var _ref2 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(moduleOpts, requireOnce) {
+      var _ref2 = asyncToGenerator(index$1.mark(function _callee2(moduleOpts, requireOnce) {
         var _this2 = this;
 
         var options, originalSrc, module, alreadyRequired;
-        return regenerator.wrap(function _callee2$(_context2) {
+        return index$1.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -1933,132 +1699,6 @@ var ModuleContainer = function (_Tapable) {
   return ModuleContainer;
 }(Tapable);
 
-var MetaRenderer = function () {
-  function MetaRenderer(nuxt, renderer) {
-    classCallCheck(this, MetaRenderer);
-
-    this.nuxt = nuxt;
-    this.renderer = renderer;
-    this.options = nuxt.options;
-    this.vueRenderer = VueServerRenderer__default.createRenderer();
-    this.cache = LRU({});
-
-    // Add VueMeta to Vue (this is only for SPA mode)
-    // See lib/app/index.js
-    Vue.use(VueMeta, {
-      keyName: 'head',
-      attribute: 'data-n-head',
-      ssrAttribute: 'data-n-head-ssr',
-      tagIDKeyName: 'hid'
-    });
-  }
-
-  createClass(MetaRenderer, [{
-    key: 'getMeta',
-    value: function getMeta(url) {
-      var _this = this;
-
-      return new Promise(function (resolve$$1, reject) {
-        var vm = new Vue({
-          render: function render(h) {
-            return h();
-          }, // Render empty html tag
-          head: _this.options.head || {}
-        });
-        _this.vueRenderer.renderToString(vm, function (err) {
-          if (err) return reject(err);
-          resolve$$1(vm.$meta().inject());
-        });
-      });
-    }
-  }, {
-    key: 'render',
-    value: function () {
-      var _ref = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(_ref2) {
-        var _ref2$url = _ref2.url,
-            url = _ref2$url === undefined ? '/' : _ref2$url;
-        var meta, m, clientManifest, publicPath;
-        return regenerator.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                meta = this.cache.get(url);
-
-                if (!meta) {
-                  _context.next = 3;
-                  break;
-                }
-
-                return _context.abrupt('return', meta);
-
-              case 3:
-
-                meta = {
-                  HTML_ATTRS: '',
-                  BODY_ATTRS: '',
-                  HEAD: ''
-                  // Get vue-meta context
-                };_context.next = 6;
-                return this.getMeta(url);
-
-              case 6:
-                m = _context.sent;
-
-                // HTML_ATTRS
-                meta.HTML_ATTRS = m.htmlAttrs.text();
-                // BODY_ATTRS
-                meta.BODY_ATTRS = m.bodyAttrs.text();
-                // HEAD tags
-                meta.HEAD = m.meta.text() + m.title.text() + m.link.text() + m.style.text() + m.script.text() + m.noscript.text();
-                // Resources Hints
-                meta.resourceHints = '';
-                // Resource Hints
-                clientManifest = this.renderer.resources.clientManifest;
-
-                if (this.options.render.resourceHints && clientManifest) {
-                  publicPath = clientManifest.publicPath || '/_nuxt/';
-                  // Pre-Load initial resources
-
-                  if (Array.isArray(clientManifest.initial)) {
-                    meta.resourceHints += clientManifest.initial.map(function (r) {
-                      return '<link rel="preload" href="' + publicPath + r + '" as="script" />';
-                    }).join('');
-                  }
-                  // Pre-Fetch async resources
-                  if (Array.isArray(clientManifest.async)) {
-                    meta.resourceHints += clientManifest.async.map(function (r) {
-                      return '<link rel="prefetch" href="' + publicPath + r + '" />';
-                    }).join('');
-                  }
-                  // Add them to HEAD
-                  if (meta.resourceHints) {
-                    meta.HEAD += meta.resourceHints;
-                  }
-                }
-
-                // Set meta tags inside cache
-                this.cache.set(url, meta);
-
-                return _context.abrupt('return', meta);
-
-              case 15:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function render(_x) {
-        return _ref.apply(this, arguments);
-      }
-
-      return render;
-    }()
-  }]);
-  return MetaRenderer;
-}();
-
 var debug$2 = Debug('nuxt:render');
 debug$2.color = 4; // Force blue color
 
@@ -2079,7 +1719,6 @@ var Renderer = function (_Tapable) {
 
     // Will be set by createRenderer
     _this.bundleRenderer = null;
-    _this.metaRenderer = null;
 
     // Will be available on dev
     _this.webpackDevMiddleware = null;
@@ -2094,27 +1733,38 @@ var Renderer = function (_Tapable) {
       serverBundle: null,
       ssrTemplate: null,
       spaTemplate: null,
-      errorTemplate: parseTemplate('Nuxt.js Internal Server Error')
-    };
+      errorTemplate: parseTemplate('<pre>{{ stack }}</pre>') // Will be loaded on ready
+
+
+      // Bind middleware to this context
+    };_this.nuxtMiddleware = _this.nuxtMiddleware.bind(_this);
+    _this.errorMiddleware = _this.errorMiddleware.bind(_this);
     return _this;
   }
 
   createClass(Renderer, [{
     key: '_ready',
     value: function () {
-      var _ref = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
-        return regenerator.wrap(function _callee$(_context) {
+      var _ref = asyncToGenerator(index$1.mark(function _callee() {
+        var errorTemplatePath;
+        return index$1.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.nuxt.applyPluginsAsync('renderer', this);
-
-              case 2:
-                _context.next = 4;
                 return this.setupMiddleware();
 
-              case 4:
+              case 2:
+
+                // Load error template
+                errorTemplatePath = path.resolve(this.options.buildDir, 'views/error.html');
+
+                if (fs$1.existsSync(errorTemplatePath)) {
+                  this.resources.errorTemplate = parseTemplate(fs$1.readFileSync(errorTemplatePath, 'utf8'));
+                }
+
+                // Load SSR resources from fs
+
                 if (this.options.dev) {
                   _context.next = 7;
                   break;
@@ -2125,7 +1775,7 @@ var Renderer = function (_Tapable) {
 
               case 7:
                 _context.next = 9;
-                return this.applyPluginsAsync('ready', this);
+                return this.nuxt.applyPluginsAsync('renderer', this);
 
               case 9:
               case 'end':
@@ -2144,13 +1794,13 @@ var Renderer = function (_Tapable) {
   }, {
     key: 'loadResources',
     value: function () {
-      var _ref2 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2() {
+      var _ref2 = asyncToGenerator(index$1.mark(function _callee2() {
         var _this2 = this;
 
         var _fs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : fs$1;
 
-        var distPath, updated, errorTemplatePath, loadingHTMLPath;
-        return regenerator.wrap(function _callee2$(_context2) {
+        var distPath, updated;
+        return index$1.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -2185,35 +1835,12 @@ var Renderer = function (_Tapable) {
                   updated.push(key);
                 });
 
-                // Reload error template
-                errorTemplatePath = path.resolve(this.options.buildDir, 'views/error.html');
-
-                if (fs$1.existsSync(errorTemplatePath)) {
-                  this.resources.errorTemplate = parseTemplate(fs$1.readFileSync(errorTemplatePath, 'utf8'));
-                }
-
-                // Load loading template
-                loadingHTMLPath = path.resolve(this.options.buildDir, 'loading.html');
-
-                if (fs$1.existsSync(loadingHTMLPath)) {
-                  this.resources.loadingHTML = fs$1.readFileSync(loadingHTMLPath, 'utf8');
-                  this.resources.loadingHTML = this.resources.loadingHTML.replace(/[\r|\n]/g, '');
-                } else {
-                  this.resources.loadingHTML = '';
-                }
-
-                // Call resourcesLoaded plugin
-                _context2.next = 9;
-                return this.applyPluginsAsync('resourcesLoaded', this.resources);
-
-              case 9:
-
                 if (updated.length > 0) {
                   // debug('Updated', updated.join(', '), isServer)
                   this.createRenderer();
                 }
 
-              case 10:
+              case 4:
               case 'end':
                 return _context2.stop();
             }
@@ -2230,24 +1857,18 @@ var Renderer = function (_Tapable) {
   }, {
     key: 'createRenderer',
     value: function createRenderer() {
-      // Ensure resources are available
-      if (!this.isResourcesAvailable) {
-        return;
-      }
-
-      // Create Meta Renderer
-      this.metaRenderer = new MetaRenderer(this.nuxt, this);
-
-      // Show Open URL
-      this.nuxt.showOpen();
-
-      // Skip following steps if noSSR mode
+      // Skip if SSR is disabled
       if (this.noSSR) {
         return;
       }
 
+      // If resources are not yet provided
+      if (!this.resources.serverBundle || !this.resources.clientManifest) {
+        return;
+      }
+
       // Create bundle renderer for SSR
-      this.bundleRenderer = VueServerRenderer.createBundleRenderer(this.resources.serverBundle, Object.assign({
+      this.bundleRenderer = vueServerRenderer.createBundleRenderer(this.resources.serverBundle, Object.assign({
         clientManifest: this.resources.clientManifest,
         runInNewContext: false,
         basedir: this.options.rootDir
@@ -2260,35 +1881,24 @@ var Renderer = function (_Tapable) {
     key: 'useMiddleware',
     value: function useMiddleware(m) {
       // Resolve
-      var $m = m;
-      var src = void 0;
       if (typeof m === 'string') {
-        src = this.nuxt.resolvePath(m);
-        m = require(src);
+        m = require(this.nuxt.resolvePath(m));
       }
-      if (typeof m.handler === 'string') {
-        src = this.nuxt.resolvePath(m.handler);
-        m.handler = require(src);
-      }
-
-      var handler = m.handler || m;
-      var path$$1 = ((m.prefix !== false ? this.options.router.base : '') + (m.path ? m.path : '')).replace(/\/\//g, '/');
-
-      // Inject $src and $m to final handler
-      if (src) handler.$src = src;
-      handler.$m = $m;
-
       // Use middleware
-      this.app.use(path$$1, handler);
+      if (m instanceof Function) {
+        this.app.use(m);
+      } else if (m && m.path && m.handler) {
+        this.app.use(m.path, m.handler);
+      }
     }
   }, {
     key: 'setupMiddleware',
     value: function () {
-      var _ref4 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee4() {
+      var _ref4 = asyncToGenerator(index$1.mark(function _callee4() {
         var _this3 = this;
 
         var distDir;
-        return regenerator.wrap(function _callee4$(_context4) {
+        return index$1.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
@@ -2304,6 +1914,10 @@ var Renderer = function (_Tapable) {
 
                 // Common URL checks
                 this.useMiddleware(function (req, res, next) {
+                  // If base in req.url, remove it for the middleware and vue-router
+                  if (_this3.options.router.base !== '/' && req.url.indexOf(_this3.options.router.base) === 0) {
+                    req.url = req.url.replace(_this3.options.router.base, '/');
+                  }
                   // Prevent access to SSR resources
                   if (ssrResourceRegex.test(req.url)) {
                     res.statusCode = 404;
@@ -2315,8 +1929,8 @@ var Renderer = function (_Tapable) {
                 // Add webpack middleware only for development
                 if (this.options.dev) {
                   this.useMiddleware(function () {
-                    var _ref5 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee3(req, res, next) {
-                      return regenerator.wrap(function _callee3$(_context3) {
+                    var _ref5 = asyncToGenerator(index$1.mark(function _callee3(req, res, next) {
+                      return index$1.wrap(function _callee3$(_context3) {
                         while (1) {
                           switch (_context3.prev = _context3.next) {
                             case 0:
@@ -2363,7 +1977,7 @@ var Renderer = function (_Tapable) {
                   distDir = path.resolve(this.options.buildDir, 'dist');
 
                   this.useMiddleware({
-                    path: this.publicPath,
+                    path: isUrl(this.options.build.publicPath) ? defaultOptions.build.publicPath : this.options.build.publicPath,
                     handler: serveStatic(distDir, {
                       index: false, // Don't serve index.html template
                       maxAge: this.options.dev ? 0 : '1y' // 1 year in production
@@ -2377,12 +1991,10 @@ var Renderer = function (_Tapable) {
                 });
 
                 // Finally use nuxtMiddleware
-                this.useMiddleware(this.nuxtMiddleware.bind(this));
+                this.useMiddleware(this.nuxtMiddleware);
 
                 // Error middleware for errors that occurred in middleware that declared above
-                // Middleware should exactly take 4 arguments
-                // https://github.com/senchalabs/connect#error-middleware
-                this.useMiddleware(this.errorMiddleware.bind(this));
+                this.useMiddleware(this.errorMiddleware);
 
               case 10:
               case 'end':
@@ -2401,10 +2013,10 @@ var Renderer = function (_Tapable) {
   }, {
     key: 'nuxtMiddleware',
     value: function () {
-      var _ref6 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee5(req, res, next) {
+      var _ref6 = asyncToGenerator(index$1.mark(function _callee5(req, res, next) {
         var context, _ref7, html, error, redirected, resourceHints, etag, regex, pushAssets, m, _m, _m2, _2, rel, href, as;
 
-        return regenerator.wrap(function _callee5$(_context5) {
+        return index$1.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
@@ -2489,19 +2101,9 @@ var Renderer = function (_Tapable) {
                 _context5.prev = 27;
                 _context5.t0 = _context5['catch'](2);
 
-                if (!(context && context.redirected)) {
-                  _context5.next = 32;
-                  break;
-                }
+                next(this.errorMiddleware(_context5.t0, req, res, next, context));
 
-                console.error(_context5.t0); // eslint-disable-line no-console
-                return _context5.abrupt('return', _context5.t0);
-
-              case 32:
-
-                next(_context5.t0);
-
-              case 33:
+              case 30:
               case 'end':
                 return _context5.stop();
             }
@@ -2517,253 +2119,61 @@ var Renderer = function (_Tapable) {
     }()
   }, {
     key: 'errorMiddleware',
-    value: function errorMiddleware(err, req, res, next) {
-      // ensure statusCode, message and name fields
-      err.statusCode = err.statusCode || 500;
-      err.message = err.message || 'Nuxt Server Error';
-      err.name = !err.name || err.name === 'Error' ? 'NuxtServerError' : err.name;
-
-      var sendResponse = function sendResponse(content) {
-        var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text/html';
-
-        // Set Headers
-        res.statusCode = err.statusCode;
-        res.statusMessage = err.name;
-        res.setHeader('Content-Type', type + '; charset=utf-8');
-        res.setHeader('Content-Length', Buffer.byteLength(content));
-
-        // Send Response
-        res.end(content, 'utf-8');
-      };
-
-      // Check if request accepts JSON
-      var hasReqHeader = function hasReqHeader(header, includes) {
-        return req.headers[header] && req.headers[header].toLowerCase().indexOf(includes) !== -1;
-      };
-      var isJson = hasReqHeader('accept', 'application/json') || hasReqHeader('user-agent', 'curl/');
-
-      // Use basic errors when debug mode is disabled
-      if (!this.options.debug) {
-        // Json format is compatible with Youch json responses
-        var json = {
-          status: err.statusCode,
-          message: err.message,
-          name: err.name
-        };
-        if (isJson) {
-          sendResponse(JSON.stringify(json, undefined, 2), 'text/json');
-          return;
-        }
-        var html = this.resources.errorTemplate(json);
-        sendResponse(html);
-        return;
-      }
-
-      // Show stack trace
-      var youch = new Youch(err, req, this.readSource.bind(this));
-      if (isJson) {
-        youch.toJSON().then(function (json) {
-          sendResponse(JSON.stringify(json, undefined, 2), 'text/json');
-        });
-      } else {
-        youch.toHTML().then(function (html) {
-          sendResponse(html);
-        });
-      }
-    }
-  }, {
-    key: 'readSource',
     value: function () {
-      var _ref8 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee6(frame) {
-        var serverBundle, sanitizeName, smc, _smc$originalPosition, line, column, name, source, contents, searchPath, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, pathDir, fullPath, _source;
-
-        return regenerator.wrap(function _callee6$(_context6) {
+      var _ref8 = asyncToGenerator(index$1.mark(function _callee6(err, req, res, next, context) {
+        var html;
+        return index$1.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                serverBundle = this.resources.serverBundle;
-
-                // Remove webpack:/// & query string from the end
-
-                sanitizeName = function sanitizeName(name) {
-                  return name ? name.replace('webpack:///', '').split('?')[0] : '';
-                };
-
-                // SourceMap Support for SSR Bundle
-
-
-                if (!(serverBundle && serverBundle.maps[frame.fileName])) {
-                  _context6.next = 16;
+                if (!(context && context.redirected)) {
+                  _context6.next = 3;
                   break;
                 }
 
-                // Initialize smc cache
-                if (!serverBundle.$maps) {
-                  serverBundle.$maps = {};
-                }
+                console.error(err); // eslint-disable-line no-console
+                return _context6.abrupt('return', err);
 
-                // Read SourceMap object
-                smc = serverBundle.$maps[frame.fileName] || new sourceMap.SourceMapConsumer(serverBundle.maps[frame.fileName]);
+              case 3:
 
-                serverBundle.$maps[frame.fileName] = smc;
-
-                // Try to find original position
-                _smc$originalPosition = smc.originalPositionFor({
-                  line: frame.getLineNumber() || 0,
-                  column: frame.getColumnNumber() || 0
-                }), line = _smc$originalPosition.line, column = _smc$originalPosition.column, name = _smc$originalPosition.name, source = _smc$originalPosition.source;
-
-                if (line) {
-                  frame.lineNumber = line;
-                }
-                if (column) {
-                  frame.columnNumber = column;
-                }
-                if (name) {
-                  frame.functionName = name;
-                }
-
-                if (!source) {
-                  _context6.next = 16;
-                  break;
-                }
-
-                frame.fileName = sanitizeName(source);
-
-                // Source detected, try to get original source code
-                contents = smc.sourceContentFor(source);
-
-                if (!contents) {
-                  _context6.next = 16;
-                  break;
-                }
-
-                frame.contents = contents;
-                return _context6.abrupt('return');
-
-              case 16:
-                if (frame.fileName) {
-                  _context6.next = 18;
-                  break;
-                }
-
-                return _context6.abrupt('return');
-
-              case 18:
-
-                frame.fileName = sanitizeName(frame.fileName);
-
-                // Try to read from SSR bundle files
-
-                if (!(serverBundle && serverBundle.files[frame.fileName])) {
-                  _context6.next = 22;
-                  break;
-                }
-
-                frame.contents = serverBundle.files[frame.fileName];
-                return _context6.abrupt('return');
-
-              case 22:
-
-                // Possible paths for file
-                searchPath = [this.options.rootDir, path.join(this.options.buildDir, 'dist'), this.options.srcDir, this.options.buildDir];
-
-                // Scan filesystem
-
-                _iteratorNormalCompletion = true;
-                _didIteratorError = false;
-                _iteratorError = undefined;
-                _context6.prev = 26;
-                _iterator = searchPath[Symbol.iterator]();
-
-              case 28:
-                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                  _context6.next = 40;
-                  break;
-                }
-
-                pathDir = _step.value;
-                fullPath = path.resolve(pathDir, frame.fileName);
-                _context6.next = 33;
-                return fs$1.readFile(fullPath, 'utf-8').catch(function () {
-                  return null;
+                // Render error template
+                html = this.resources.errorTemplate({
+                  error: err,
+                  stack: ansiHTML(encodeHtml(err.stack))
                 });
+                // Send response
 
-              case 33:
-                _source = _context6.sent;
+                res.statusCode = 500;
+                res.setHeader('Content-Type', 'text/html; charset=utf-8');
+                res.setHeader('Content-Length', Buffer.byteLength(html));
+                res.end(html, 'utf8');
+                return _context6.abrupt('return', err);
 
-                if (!_source) {
-                  _context6.next = 37;
-                  break;
-                }
-
-                frame.contents = _source;
-                return _context6.abrupt('return');
-
-              case 37:
-                _iteratorNormalCompletion = true;
-                _context6.next = 28;
-                break;
-
-              case 40:
-                _context6.next = 46;
-                break;
-
-              case 42:
-                _context6.prev = 42;
-                _context6.t0 = _context6['catch'](26);
-                _didIteratorError = true;
-                _iteratorError = _context6.t0;
-
-              case 46:
-                _context6.prev = 46;
-                _context6.prev = 47;
-
-                if (!_iteratorNormalCompletion && _iterator.return) {
-                  _iterator.return();
-                }
-
-              case 49:
-                _context6.prev = 49;
-
-                if (!_didIteratorError) {
-                  _context6.next = 52;
-                  break;
-                }
-
-                throw _iteratorError;
-
-              case 52:
-                return _context6.finish(49);
-
-              case 53:
-                return _context6.finish(46);
-
-              case 54:
+              case 9:
               case 'end':
                 return _context6.stop();
             }
           }
-        }, _callee6, this, [[26, 42, 46, 54], [47,, 49, 53]]);
+        }, _callee6, this);
       }));
 
-      function readSource(_x9) {
+      function errorMiddleware(_x8, _x9, _x10, _x11, _x12) {
         return _ref8.apply(this, arguments);
       }
 
-      return readSource;
+      return errorMiddleware;
     }()
   }, {
     key: 'renderRoute',
     value: function () {
-      var _ref9 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee7(url) {
+      var _ref9 = asyncToGenerator(index$1.mark(function _callee7(url) {
         var _this4 = this;
 
         var context = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        var spa, _ref10, HTML_ATTRS, BODY_ATTRS, _HEAD, _resourceHints, _APP, err, data, _html, APP, m, HEAD, resourceHints, html;
+        var _APP, _HEAD, _html, APP, m, HEAD, resourceHints, html;
 
-        return regenerator.wrap(function _callee7$(_context7) {
+        return index$1.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
@@ -2787,50 +2197,30 @@ var Renderer = function (_Tapable) {
                 context.url = url;
                 context.isServer = true;
 
-                // Basic response if SSR is disabled or spa data provided
-                spa = context.spa || context.res && context.res.spa;
+                // Basic response if SSR is disabled
 
-                if (!(this.noSSR || spa)) {
-                  _context7.next = 21;
+                if (!this.noSSR) {
+                  _context7.next = 10;
                   break;
                 }
 
-                _context7.next = 9;
-                return this.metaRenderer.render(context);
-
-              case 9:
-                _ref10 = _context7.sent;
-                HTML_ATTRS = _ref10.HTML_ATTRS;
-                BODY_ATTRS = _ref10.BODY_ATTRS;
-                _HEAD = _ref10.HEAD;
-                _resourceHints = _ref10.resourceHints;
-                _APP = '<div id="__nuxt">' + this.resources.loadingHTML + '</div>';
-
-                // Detect 404 errors
-
-                if (!(url.indexOf(this.options.build.publicPath) !== -1 || url.indexOf('__webpack') !== -1)) {
-                  _context7.next = 18;
-                  break;
-                }
-
-                err = { statusCode: 404, message: this.options.messages.error_404, name: 'ResourceNotFound' };
-                throw err;
-
-              case 18:
-                data = {
-                  HTML_ATTRS: HTML_ATTRS,
-                  BODY_ATTRS: BODY_ATTRS,
+                _APP = '<div id="__nuxt"></div>';
+                _HEAD = '';
+                _html = this.resources.spaTemplate({
+                  HTML_ATTRS: '',
+                  BODY_ATTRS: '',
                   HEAD: _HEAD,
                   APP: _APP
-                };
-                _html = this.resources.spaTemplate(data);
-                return _context7.abrupt('return', { html: _html, resourceHints: _resourceHints });
+                });
+                return _context7.abrupt('return', {
+                  html: _html
+                });
 
-              case 21:
-                _context7.next = 23;
+              case 10:
+                _context7.next = 12;
                 return this.bundleRenderer.renderToString(context);
 
-              case 23:
+              case 12:
                 APP = _context7.sent;
 
 
@@ -2847,12 +2237,14 @@ var Renderer = function (_Tapable) {
                 resourceHints = '';
 
 
-                if (this.options.render.resourceHints) {
-                  resourceHints = context.renderResourceHints();
-                  HEAD += resourceHints;
+                if (!this.staticSSR) {
+                  if (this.options.render.resourceHints) {
+                    resourceHints = context.renderResourceHints();
+                    HEAD += resourceHints;
+                  }
+                  APP += '<script type="text/javascript">window.__NUXT__=' + serialize(context.nuxt, { isJSON: true }) + ';</script>';
+                  APP += context.renderScripts();
                 }
-                APP += '<script type="text/javascript">window.__NUXT__=' + serialize(context.nuxt, { isJSON: true }) + ';</script>';
-                APP += context.renderScripts();
 
                 HEAD += context.renderStyles();
 
@@ -2869,7 +2261,7 @@ var Renderer = function (_Tapable) {
                   redirected: context.redirected
                 });
 
-              case 35:
+              case 22:
               case 'end':
                 return _context7.stop();
             }
@@ -2877,7 +2269,7 @@ var Renderer = function (_Tapable) {
         }, _callee7, this);
       }));
 
-      function renderRoute(_x10) {
+      function renderRoute(_x13) {
         return _ref9.apply(this, arguments);
       }
 
@@ -2886,12 +2278,12 @@ var Renderer = function (_Tapable) {
   }, {
     key: 'renderAndGetWindow',
     value: function () {
-      var _ref11 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee8(url) {
+      var _ref10 = asyncToGenerator(index$1.mark(function _callee8(url) {
         var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        var options, _ref12, window, nuxtExists, error;
+        var options, _ref11, window, nuxtExists, error;
 
-        return regenerator.wrap(function _callee8$(_context8) {
+        return index$1.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
@@ -2933,8 +2325,8 @@ var Renderer = function (_Tapable) {
                 return jsdom.JSDOM.fromURL(url, options);
 
               case 16:
-                _ref12 = _context8.sent;
-                window = _ref12.window;
+                _ref11 = _context8.sent;
+                window = _ref11.window;
 
                 // If Nuxt could not be loaded (error from the server-side)
                 nuxtExists = window.document.body.innerHTML.indexOf('window.__NUXT__') !== -1;
@@ -2969,8 +2361,8 @@ var Renderer = function (_Tapable) {
         }, _callee8, this, [[1, 5]]);
       }));
 
-      function renderAndGetWindow(_x12) {
-        return _ref11.apply(this, arguments);
+      function renderAndGetWindow(_x15) {
+        return _ref10.apply(this, arguments);
       }
 
       return renderAndGetWindow;
@@ -2981,34 +2373,17 @@ var Renderer = function (_Tapable) {
       return this.options.render.ssr === false;
     }
   }, {
+    key: 'staticSSR',
+    get: function get$$1() {
+      return this.options.render.ssr === 'static';
+    }
+  }, {
     key: 'isReady',
     get: function get$$1() {
       if (this.noSSR) {
-        return Boolean(this.resources.spaTemplate);
+        return this.resources.spaTemplate;
       }
-
-      return Boolean(this.bundleRenderer && this.resources.ssrTemplate);
-    }
-  }, {
-    key: 'isResourcesAvailable',
-    get: function get$$1() {
-      // Required for both
-      if (!this.resources.clientManifest) {
-        return false;
-      }
-
-      // Required for SPA rendering
-      if (this.noSSR) {
-        return Boolean(this.resources.spaTemplate);
-      }
-
-      // Required for bundle renderer
-      return Boolean(this.resources.ssrTemplate && this.resources.serverBundle);
-    }
-  }, {
-    key: 'publicPath',
-    get: function get$$1() {
-      return isUrl(this.options.build.publicPath) ? Options.defaults.build.publicPath : this.options.build.publicPath;
+      return this.bundleRenderer && this.resources.ssrTemplate;
     }
   }]);
   return Renderer;
@@ -3056,7 +2431,7 @@ var Nuxt = function (_Tapable) {
 
     var _this = possibleConstructorReturn(this, (Nuxt.__proto__ || Object.getPrototypeOf(Nuxt)).call(this));
 
-    _this.options = Options.from(_options);
+    _this.options = Options(_options);
 
     // Paths for resolving requires from `rootDir`
     _this.nodeModulePaths = Module._nodeModulePaths(_this.options.rootDir);
@@ -3073,9 +2448,6 @@ var Nuxt = function (_Tapable) {
     _this.renderRoute = _this.renderer.renderRoute.bind(_this.renderer);
     _this.renderAndGetWindow = _this.renderer.renderAndGetWindow.bind(_this.renderer);
 
-    // Default Show Open if Nuxt is not listening
-    _this.showOpen = function () {};
-
     _this._ready = _this.ready().catch(_this.errorHandler);
     return _this;
   }
@@ -3083,8 +2455,8 @@ var Nuxt = function (_Tapable) {
   createClass(Nuxt, [{
     key: 'ready',
     value: function () {
-      var _ref = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee() {
-        return regenerator.wrap(function _callee$(_context) {
+      var _ref = asyncToGenerator(index$1.mark(function _callee() {
+        return index$1.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -3134,19 +2506,17 @@ var Nuxt = function (_Tapable) {
       var port = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3000;
       var host = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'localhost';
 
-      // Update showOpen
-      this.showOpen = function () {
-        var _host = host === '0.0.0.0' ? 'localhost' : host;
-        // eslint-disable-next-line no-console
-        console.log('\n' + chalk.bgGreen.black(' OPEN ') + chalk.green(' http://' + _host + ':' + port + '\n'));
-      };
-
       return new Promise(function (resolve$$1, reject) {
         var server = _this2.renderer.app.listen({ port: port, host: host, exclusive: false }, function (err) {
           /* istanbul ignore if */
           if (err) {
             return reject(err);
           }
+
+          // Show Open URL
+          var _host = host === '0.0.0.0' ? 'localhost' : host;
+          // eslint-disable-next-line no-console
+          console.log('\n' + chalk.bold(chalk.bgBlue.black(' OPEN ') + chalk.blue(' http://' + _host + ':' + port + '\n')));
 
           // Close server on nuxt close
           _this2.plugin('close', function () {
@@ -3163,7 +2533,7 @@ var Nuxt = function (_Tapable) {
             });
           });
 
-          resolve$$1(_this2.applyPluginsAsync('listen', { server: server, port: port, host: host }));
+          resolve$$1();
         });
 
         // Add server.destroy(cb) method
@@ -3214,8 +2584,8 @@ var Nuxt = function (_Tapable) {
   }, {
     key: 'close',
     value: function () {
-      var _ref2 = asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee2(callback) {
-        return regenerator.wrap(function _callee2$(_context2) {
+      var _ref2 = asyncToGenerator(index$1.mark(function _callee2(callback) {
+        return index$1.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -3249,9 +2619,13 @@ var Nuxt = function (_Tapable) {
   return Nuxt;
 }(Tapable);
 
-exports.Nuxt = Nuxt;
-exports.Module = ModuleContainer;
-exports.Renderer = Renderer;
-exports.Options = Options;
-exports.Utils = Utils;
+var index = {
+  Options: Options,
+  ModuleContainer: ModuleContainer,
+  Nuxt: Nuxt,
+  Renderer: Renderer,
+  Utils: Utils
+};
+
+module.exports = index;
 //# sourceMappingURL=core.js.map
