@@ -1,6 +1,6 @@
 {
   "name": "gull-seed",
-  "version": "1.0.1-rc13",
+  "version": "1.0.0",
   "description": "gull-seed 是基于NUXT开发的一套Server Side Rendering（服务端渲染）, 主要解决单页面应用的 SEO 的问题",
   "main": "./index.js",
   "license": "MIT",
@@ -19,7 +19,9 @@
     "lib",
     "index.js"
   ],
-  "keywords": ["gull-seed"],
+  "keywords": [
+    "gull-seed"
+  ],
   "homepage": "https://github.com/visionsj/gull-seed#readme",
   "bin": {
     "nuxt": "./bin/nuxt"
@@ -30,17 +32,7 @@
     ]
   },
   "scripts": {
-    "test": "npm run lint && cross-env NODE_ENV=test npm run build:nuxt && nyc ava --verbose --serial test/ -- && nyc report --reporter=html",
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "lint": "eslint --ext .js,.vue bin lib pages test/*.js --ignore-pattern app",
-    "build": "rimraf dist/ && npm run build:nuxt && npm run build:core",
-    "build:nuxt": "rollup -c build/rollup.config.js --environment TARGET:nuxt",
-    "build:core": "rollup -c build/rollup.config.js --environment TARGET:core",
-    "watch": "npm run build:nuxt -- -w",
-    "make-start": "node ./build/start.js",
-    "precommit": "npm run lint",
-    "prepare": "npm run build && npm run make-start",
-    "postinstall": "opencollective postinstall || exit 0"
+
   },
   "engines": {
     "node": ">=6.11",
