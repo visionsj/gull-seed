@@ -6,12 +6,15 @@
 安装依赖包 
 
 第一步：(在这里我们建议使用淘宝镜像)
+
 $ yarn config set registry http://registry.npm.taobao.org
 
 第二步：
+
 $ yarn install or yarn
 
 第三步：
+
 $ yarn add gull-seed
 
 
