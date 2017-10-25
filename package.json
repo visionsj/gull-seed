@@ -1,6 +1,6 @@
-{
+﻿{
   "name": "gull-seed",
-  "version": "1.0.0",
+  "version": "1.0.0-rc1",
   "description": "gull-seed 是基于NUXT开发的一套Server Side Rendering（服务端渲染）, 主要解决单页面应用的 SEO 的问题",
   "main": "./index.js",
   "license": "MIT",
