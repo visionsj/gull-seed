@@ -1600,7 +1600,7 @@ Options.defaults = {
     extractCSS: false,
     cssSourceMap: undefined,
     ssr: undefined,
-    publicPath: '/_nuxt/',
+    publicPath: '/_gull/',
     filenames: {
       css: 'common.[contenthash].css',
       manifest: 'manifest.[hash].js',

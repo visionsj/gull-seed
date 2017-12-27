@@ -1586,7 +1586,7 @@ Options.defaults = {
     extractCSS: false,
     cssSourceMap: undefined,
     ssr: undefined,
-    publicPath: '/_nuxt/',
+    publicPath: '/_gull/',
     filenames: {
       css: 'common.[contenthash].css',
       manifest: 'manifest.[hash].js',
@@ -2016,7 +2016,7 @@ var MetaRenderer = function () {
                 clientManifest = this.renderer.resources.clientManifest;
 
                 if (this.options.render.resourceHints && clientManifest) {
-                  publicPath = clientManifest.publicPath || '/_nuxt/';
+                  publicPath = clientManifest.publicPath || '/_gull/';
                   // Pre-Load initial resources
 
                   if (Array.isArray(clientManifest.initial)) {
